@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>FINKI Tickets</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <script src="https://kit.fontawesome.com/c8e0ac3c9e.js" crossorigin="anonymous"></script>
+</head>
+<body>
+<div class="container-fluid bg-light mb-3">
+    <div class="container">
+        <nav class="navbar navbar-expand-lg navbar-light">
+            <a class="navbar-brand" href="/">ФИНКИ</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+                <div class="navbar-nav">
+                    <a class="nav-item nav-link" href="/">Почетна</a>
+                    <a class="nav-item nav-link" href="/account/">Профил</a>
+                    <a th:each="c : ${availableCategories}" th:text="${c.name}" th:href="@{'/c/' + ${c.id}}" class="nav-item nav-link"></a>
+                </div>
+            </div>
+        </nav>
+    </div>
+</div>
+<div th:if="${error}" class="container">
+    <p>Страницата што ја баравте не е достапна:</p>
+    <ul>
+        <li>Настанот сеуште не е прифатен</li>
+        <li>Настанот е завршен</li>
+        <li>Настанот не постои</li>
+    </ul>
+    <a href="/">Почетна</a>
+</div>
+<div th:unless="${error}" class="container">
+    <h3 th:text="${event.name}"></h3><hr/>
+    <div class="row">
+        <div class="col-md-6">
+            <img th:src="${event.cover}" style="width: auto; max-width: 80%; max-height: 400px;"/>
+        </div>
+        <div class="col-md-6">
+            <p><i class="fas fa-map-marker-alt"></i> <span th:text="${event.location}"></span></p>
+            <p><i class="far fa-calendar-alt"></i> <span th:text="${event.date}"></span></p>
+        </div>
+    </div>
+    <hr/>
+    <div class="row mt-5">
+        <div class="col-md-12">
+            <h5>Достапни билети</h5>
+            <div th:if="${#lists.isEmpty(tickets)}">
+                <p>Моментално нема достапни билети за овој настан.</p>
+            </div>
+            <div th:each="t : ${tickets}">
+                <div th:if="${not t.sold}" class="alert alert-info">
+                    <div class="form-inline float-right">
+                        <input type="hidden" name="t" th:id="${'t'+t.id}" th:value="${t.id}"/>
+                        <input type="number" name="q" th:id="${'q'+t.id}" value="1" min="1" th:max="${t.quantity}" class="form-control form-control-sm"/>
+                        <button type="submit" class="btn btn-outline-danger btn-sm" th:onclick="|buy('${t.id}')|">&nbsp; Купи <i class="fas fa-shopping-cart"></i> &nbsp;</button>
+                    </div>
+                    <p>
+                        <label><i class="far fa-clock"></i> <span th:text="${t.time}"></span></label><br/>
+                        <label th:if="${t.price} == 0"><span class="badge badge-success">БЕСПЛАТНО</span></label>
+                        <label th:unless="${t.price} == 0"><i class="far fa-money-bill-alt"></i> <span th:text="${t.price + ' ден'}"></span></label><br/>
+                        <label><i class="fas fa-sort-amount-up-alt"></i> Количина: <span class="font-weight-bold" th:text="${t.quantity}"></span></label>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    function buy(id){
+        let t = document.getElementById("t"+id);
+        let q = document.getElementById("q"+id);
+        window.location = "/ticket/buy/"+t.value+"/"+q.value;
+    }
+</script>
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+</body>
+</html>

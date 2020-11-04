@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>FINKI Tickets</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+</head>
+<body>
+<div class="container-fluid bg-light mb-3">
+    <div class="container">
+        <nav class="navbar navbar-expand-lg navbar-light">
+            <a class="navbar-brand" href="/">ФИНКИ</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+                <div class="navbar-nav">
+                    <a class="nav-item nav-link" href="/">Почетна</a>
+                    <a class="nav-item nav-link" href="/account/">Профил</a>
+                    <a th:each="c : ${availableCategories}" th:text="${c.name}" th:href="@{'/c/' + ${c.id}}" class="nav-item nav-link"></a>
+                </div>
+            </div>
+        </nav>
+    </div>
+</div>
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-9">
+            <h3>Добредојде, <span th:text="${user.name}"></span></h3>
+        </div>
+        <div class="col-md-3 text-right">
+            <a href="/account/logout" class="btn btn-link float-right">Одјави се</a>
+        </div>
+    </div>
+    <hr/>
+    <div class="alert alert-secondary rounded-0">
+        <div class="row">
+            <div class="col-md-6">
+                <span th:if="${user.role == 'ADMIN'}" class="badge badge-primary">ADMIN</span>&nbsp;
+                <span th:text="${user.email}"></span>
+            </div>
+            <div class="col-md-6 text-right">
+                <a href="/account/settings" class="btn btn-outline-dark btn-sm">Измени профил</a>
+            </div>
+        </div>
+    </div>
+
+    <div th:if="${user.role == 'ADMIN'}" class="jumbotron">
+        <h5>Админ панел</h5>
+        <div class="row">
+            <div class="col-md-4">
+                <p>Вкупно корисници: <span th:text="${#lists.size(allUsers)}"></span></p>
+            </div>
+            <div class="col-md-4">
+                <a href="/category/">Категории</a><br/>
+                <p>Вкупно категории: <span th:text="${#lists.size(allCategories)}"></span></p>
+            </div>
+            <div class="col-md-4">
+                <a href="/event/all">Настани</a><br/>
+                <p>Вкупен број на моментални настани: <span th:text="${#lists.size(allEvents)}"></span></p>
+            </div>
+        </div>
+    </div>
+    <div th:if="${user.role == 'USER'}" class="main">
+        <div class="row">
+            <div class="col-md-6">
+                <a href="/">
+                    <div class="alert alert-danger rounded-0 text-center text-justify justify-content-center">
+                        <h3>Сакам карти?</h3>
+                    </div>
+                </a>
+            </div>
+            <div class="col-md-6">
+                <a href="/ticket/sell">
+                    <div class="alert alert-danger rounded-0 text-center text-justify justify-content-center">
+                        <h3>Имам карти!</h3>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <h2>Мој билети</h2>
+                <p>Вкупен профит од мои билети: <span th:text="${profit}"></span> денари.</p><hr/>
+                <p th:if="${#lists.isEmpty(tickets)}">Немате додадено ваши билети!</p>
+                <table th:unless="${#lists.isEmpty(tickets)}" class="table table-bordered table-striped">
+                    <thead>
+                        <tr>
+                            <th>Код</th>
+                            <th>Настан</th>
+                            <th>Час</th>
+                            <th>Цена</th>
+                            <th>Преостаната количина</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="t : ${tickets}">
+                            <td th:text="${t.ticketCode}"></td>
+                            <td>
+                                <a th:text="${t.event.name}" th:href="@{'/'+ ${t.event.slug}}"></a>
+                            </td>
+                            <td th:text="${t.time}"></td>
+                            <td th:text="${t.price}"></td>
+                            <td th:text="${t.quantity}"></td>
+                            <td><a th:href="@{'/ticket/cancel/' + ${t.id}}" class="btn btn-danger btn-sm">Откажи</a></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+
+</div>
+
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+</body>
+</html>
